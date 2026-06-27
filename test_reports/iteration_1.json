@@ -1,0 +1,29 @@
+{
+  "summary": "First-finish smoke test of Iron Protocol workout log. Backend API endpoints (plan, today, sessions/toggle, sessions, stats, settings, reminder/send-now, PUT plan/{day}) all functional. Frontend Dashboard renders with header, 4 stats cards, today's checklist with checkboxes, weekly plan sidebar (MON-SUN), calendar, Edit Plan dialog, and Settings dialog. Checkbox toggle updates 0/5 -> 1/5 and persists across reload. Settings save works and Resend gracefully returns sent=false with reason='disabled_or_missing_config' when key is empty.",
+  "tested_scope": ["backend", "frontend", "integration"],
+  "passed": [
+    "GET /api/plan -> 200, 7 days monday..sunday in order, sunday is_rest=true with 0 exercises, monday has 5 exercises (Chest & Triceps)",
+    "GET /api/today -> 200 returns date, day, day_label (Sat), plan object, session=null initially",
+    "POST /api/sessions/toggle marks exercise complete (1/5), second call with completed=false unmarks (0/5), total_exercises=5, completed_at null until all complete",
+    "GET /api/sessions -> 200 returns list with logged session",
+    "GET /api/stats -> 200 returns current_streak, best_streak, this_week, this_month, total_workouts",
+    "PUT /api/plan/monday updates title/exercises and reflected in subsequent GET",
+    "PUT /api/plan/foo -> 400 'Invalid day'",
+    "GET /api/settings -> 200 default; PUT /api/settings updates email/reminder_enabled/reminder_time",
+    "POST /api/reminder/send-now -> {sent:false, reason:'disabled_or_missing_config'} when RESEND_API_KEY empty",
+    "Frontend loads with 'Iron Protocol' header and all 4 stats cards (Current Streak, Best Streak, This Week, Total Workouts)",
+    "Exercise checkbox click updates progress 0/5 -> 1/5 and persists after reload",
+    "Weekly Protocol sidebar shows MON,TUE,WED,THU,FRI,SAT,SUN",
+    "Calendar heatmap element present",
+    "Edit Plan dialog opens via edit-day-{day} button; plan-title-input present",
+    "Settings dialog opens via open-settings-btn; email input, save button work; 'Settings saved' toast shown"
+  ],
+  "failed": [],
+  "action_items": [
+    "Streak-skips-Sunday logic was not deeply verified (would require mocking dates across days); the code path returning stats works but rest-day continuity behavior should be validated in full QA pass"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "retest_needed": false,
+  "full_testing_deferred": true,
+  "notes": "Backend returns full day names ('monday'..'sunday'), not 'mon'/'sun' abbreviations as worded in the request—this is consistent across plan/today/sessions and the frontend renders abbreviated labels via day_label. test_credentials: N/A (single-user, no auth)."
+}
