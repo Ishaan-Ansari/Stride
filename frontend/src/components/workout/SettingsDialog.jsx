@@ -15,6 +15,59 @@ import { updateSettings, sendReminderNow } from "@/lib/api";
 import { toast } from "sonner";
 import { Mail, Send } from "lucide-react";
 
+const buildToastError = (res) => {
+  if (res.reason === "disabled_or_missing_config") {
+    return "Enable reminder & add email first (also ensure RESEND_API_KEY is set on the server).";
+  }
+  return `Failed: ${res.error || "unknown"}`;
+};
+
+const SettingsForm = ({ email, setEmail, enabled, setEnabled, time, setTime }) => (
+  <div className="space-y-5 py-2">
+    <div className="space-y-2">
+      <Label className="label-overline">Email</Label>
+      <div className="flex items-center gap-2">
+        <Mail className="w-4 h-4 text-[#666]" />
+        <Input
+          type="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="rounded-none bg-[#0A0A0A] border-white/10 focus-visible:ring-[#007AFF] focus-visible:ring-offset-0"
+          data-testid="settings-email-input"
+        />
+      </div>
+    </div>
+
+    <div className="flex items-center justify-between">
+      <div>
+        <Label className="label-overline">Daily Reminder</Label>
+        <div className="text-sm text-[#A0A0A0] mt-1">Send at {time} server time</div>
+      </div>
+      <Switch
+        checked={enabled}
+        onCheckedChange={setEnabled}
+        data-testid="settings-reminder-switch"
+      />
+    </div>
+
+    <div className="space-y-2">
+      <Label className="label-overline">Reminder Time</Label>
+      <Input
+        type="time"
+        value={time}
+        onChange={(e) => setTime(e.target.value)}
+        className="rounded-none bg-[#0A0A0A] border-white/10 focus-visible:ring-[#007AFF] focus-visible:ring-offset-0"
+        data-testid="settings-time-input"
+      />
+      <p className="text-xs text-[#666]">
+        Default 06:30. Note: scheduler currently fires at 06:30 server time
+        regardless; changing this is informational unless you ask to wire it up.
+      </p>
+    </div>
+  </div>
+);
+
 export default function SettingsDialog({ open, onOpenChange, settings, onSaved }) {
   const [email, setEmail] = useState("");
   const [enabled, setEnabled] = useState(false);
@@ -28,7 +81,7 @@ export default function SettingsDialog({ open, onOpenChange, settings, onSaved }
       setEnabled(!!settings.reminder_enabled);
       setTime(settings.reminder_time || "06:30");
     }
-  }, [settings, open]);
+  }, [settings, open, setEmail, setEnabled, setTime]);
 
   const save = async () => {
     setSaving(true);
@@ -55,11 +108,7 @@ export default function SettingsDialog({ open, onOpenChange, settings, onSaved }
       if (res.sent) {
         toast.success("Test reminder sent");
       } else {
-        toast.error(
-          res.reason === "disabled_or_missing_config"
-            ? "Enable reminder & add email first (also ensure RESEND_API_KEY is set on the server)."
-            : `Failed: ${res.error || "unknown"}`,
-        );
+        toast.error(buildToastError(res));
       }
     } catch (e) {
       toast.error("Failed to send");
@@ -79,56 +128,18 @@ export default function SettingsDialog({ open, onOpenChange, settings, onSaved }
             Reminder Settings
           </DialogTitle>
           <DialogDescription className="text-[#A0A0A0]">
-            Get the day's plan delivered at 6:30 AM.
+            Get the day&apos;s plan delivered at 6:30 AM.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-5 py-2">
-          <div className="space-y-2">
-            <Label className="label-overline">Email</Label>
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-[#666]" />
-              <Input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="rounded-none bg-[#0A0A0A] border-white/10 focus-visible:ring-[#007AFF] focus-visible:ring-offset-0"
-                data-testid="settings-email-input"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <Label className="label-overline">Daily Reminder</Label>
-              <div className="text-sm text-[#A0A0A0] mt-1">
-                Send at {time} server time
-              </div>
-            </div>
-            <Switch
-              checked={enabled}
-              onCheckedChange={setEnabled}
-              data-testid="settings-reminder-switch"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label className="label-overline">Reminder Time</Label>
-            <Input
-              type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              className="rounded-none bg-[#0A0A0A] border-white/10 focus-visible:ring-[#007AFF] focus-visible:ring-offset-0"
-              data-testid="settings-time-input"
-            />
-            <p className="text-xs text-[#666]">
-              Default 06:30. Note: scheduler currently fires at 06:30 server
-              time regardless; changing this is informational unless you ask to
-              wire it up.
-            </p>
-          </div>
-        </div>
+        <SettingsForm
+          email={email}
+          setEmail={setEmail}
+          enabled={enabled}
+          setEnabled={setEnabled}
+          time={time}
+          setTime={setTime}
+        />
 
         <DialogFooter className="flex sm:justify-between gap-2">
           <Button

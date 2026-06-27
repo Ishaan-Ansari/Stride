@@ -21,12 +21,15 @@ function makeDevServerV5Compatible(devServerConfig) {
     ...compatibleConfig
   } = devServerConfig;
 
-  compatibleConfig.server =
-    typeof https === "object"
-      ? { type: "https", options: https }
-      : https
-        ? "https"
-        : "http";
+  let serverType;
+  if (typeof https === "object") {
+    serverType = { type: "https", options: https };
+  } else if (https) {
+    serverType = "https";
+  } else {
+    serverType = "http";
+  }
+  compatibleConfig.server = serverType;
   compatibleConfig.headers = {
     ...compatibleConfig.headers,
     "Cross-Origin-Resource-Policy": "same-origin",
@@ -134,11 +137,10 @@ if (isDevServer) {
     const { withVisualEdits } = require("@emergentbase/visual-edits/craco");
     webpackConfig = withVisualEdits(webpackConfig);
   } catch (err) {
-    if (err.code === 'MODULE_NOT_FOUND' && err.message.includes('@emergentbase/visual-edits/craco')) {
-      console.warn(
-        "[visual-edits] @emergentbase/visual-edits not installed — visual editing disabled."
-      );
-    } else {
+    const isMissingVisualEdits =
+      err.code === 'MODULE_NOT_FOUND' &&
+      err.message.includes('@emergentbase/visual-edits/craco');
+    if (!isMissingVisualEdits) {
       throw err;
     }
   }

@@ -266,76 +266,73 @@ def is_completed(session: dict) -> bool:
     done = len(session.get("completed_exercise_ids", []))
     return total > 0 and done >= total
 
+MAX_DAYS_LOOKBACK = 3650
+
+
+def _calc_current_streak(completed_dates: set, today_d: date) -> int:
+    """Walk backwards from today. Sundays are skipped (don't break/count)."""
+    checking = today_d
+    # If today not completed and not Sunday, start from yesterday
+    if checking.isoformat() not in completed_dates and get_day_name(checking) != "sunday":
+        checking -= timedelta(days=1)
+    streak = 0
+    while (today_d - checking).days <= MAX_DAYS_LOOKBACK:
+        if get_day_name(checking) == "sunday":
+            checking -= timedelta(days=1)
+            continue
+        if checking.isoformat() in completed_dates:
+            streak += 1
+            checking -= timedelta(days=1)
+        else:
+            break
+    return streak
+
+
+def _calc_best_streak(completed_dates: set, today_d: date, fallback: int) -> int:
+    """Scan all days from earliest completed date to today."""
+    if not completed_dates:
+        return fallback
+    earliest = min(date.fromisoformat(x) for x in completed_dates)
+    best = 0
+    cur = 0
+    d_iter = earliest
+    while d_iter <= today_d:
+        if get_day_name(d_iter) == "sunday":
+            d_iter += timedelta(days=1)
+            continue
+        if d_iter.isoformat() in completed_dates:
+            cur += 1
+            best = max(best, cur)
+        else:
+            cur = 0
+        d_iter += timedelta(days=1)
+    return max(best, fallback)
+
+
+def _count_completed_since(sessions: list, since: date) -> int:
+    return sum(
+        1 for s in sessions
+        if is_completed(s) and date.fromisoformat(s["date"]) >= since
+    )
+
+
 @api_router.get("/stats")
 async def get_stats():
     all_sessions = await db.sessions.find({}, {"_id": 0}).to_list(5000)
     completed_dates = {s["date"] for s in all_sessions if is_completed(s)}
-    # Current streak (counting back from today; Sunday rest days don't break)
-    current = 0
-    d = date.today()
-    # If today is not completed yet, start checking from yesterday for streak purposes,
-    # but allow today's completion to extend
-    # Approach: walk backwards. For each day, if Sunday -> skip (don't break, don't count).
-    # If completed -> +1. If not completed and not Sunday -> break.
-    # We start from today; if today not completed and today not Sunday, streak can still be
-    # based on prior days, so we start by skipping today if not completed.
-    checking = d
-    # Skip today if not completed (so user doesn't see streak=0 just because day isn't done yet)
-    if checking.isoformat() not in completed_dates and get_day_name(checking) != "sunday":
-        checking = checking - timedelta(days=1)
-    while True:
-        day_name = get_day_name(checking)
-        iso = checking.isoformat()
-        if day_name == "sunday":
-            checking = checking - timedelta(days=1)
-            # don't break, don't count
-            # safety: prevent infinite loop after very long time
-            if (date.today() - checking).days > 3650:
-                break
-            continue
-        if iso in completed_dates:
-            current += 1
-            checking = checking - timedelta(days=1)
-        else:
-            break
-        if (date.today() - checking).days > 3650:
-            break
-
-    # Best streak: scan all dates from earliest session
-    best = 0
-    if completed_dates:
-        earliest = min(date.fromisoformat(x) for x in completed_dates)
-        cur = 0
-        d_iter = earliest
-        today_d = date.today()
-        while d_iter <= today_d:
-            day_name = get_day_name(d_iter)
-            iso = d_iter.isoformat()
-            if day_name == "sunday":
-                d_iter += timedelta(days=1)
-                continue
-            if iso in completed_dates:
-                cur += 1
-                best = max(best, cur)
-            else:
-                cur = 0
-            d_iter += timedelta(days=1)
-        best = max(best, current)
-
-    # This week (Monday-Sunday)
     today_d = date.today()
+
+    current = _calc_current_streak(completed_dates, today_d)
+    best = _calc_best_streak(completed_dates, today_d, current)
     monday = today_d - timedelta(days=today_d.weekday())
-    week_completed = sum(1 for s in all_sessions if is_completed(s) and date.fromisoformat(s["date"]) >= monday)
-    # This month
     month_start = today_d.replace(day=1)
-    month_completed = sum(1 for s in all_sessions if is_completed(s) and date.fromisoformat(s["date"]) >= month_start)
-    total = len(completed_dates)
+
     return {
         "current_streak": current,
         "best_streak": best,
-        "this_week": week_completed,
-        "this_month": month_completed,
-        "total_workouts": total,
+        "this_week": _count_completed_since(all_sessions, monday),
+        "this_month": _count_completed_since(all_sessions, month_start),
+        "total_workouts": len(completed_dates),
     }
 
 # ------------------------- Settings -------------------------
@@ -344,8 +341,8 @@ async def get_stats():
 async def get_settings():
     doc = await db.settings.find_one({"id": "settings"}, {"_id": 0})
     if not doc:
-        doc = Settings().model_dump()
-        await db.settings.insert_one(doc)
+        await db.settings.insert_one(Settings().model_dump())
+        doc = await db.settings.find_one({"id": "settings"}, {"_id": 0})
     return doc
 
 @api_router.put("/settings")

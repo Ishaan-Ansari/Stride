@@ -23,6 +23,85 @@ const blankExercise = () => ({
   notes: "",
 });
 
+const ExerciseRow = ({ ex, index, onUpdate, onRemove }) => (
+  <li
+    className="grid grid-cols-12 gap-2 items-center border border-white/5 p-2"
+    data-testid={`edit-exercise-${index}`}
+  >
+    <Input
+      placeholder="Exercise name"
+      value={ex.name}
+      onChange={(e) => onUpdate({ name: e.target.value })}
+      className="col-span-6 rounded-none bg-[#0A0A0A] border-white/10 focus-visible:ring-[#007AFF] focus-visible:ring-offset-0"
+      data-testid={`edit-exercise-name-${index}`}
+    />
+    <Input
+      type="number"
+      min="1"
+      placeholder="Sets"
+      value={ex.sets}
+      onChange={(e) => onUpdate({ sets: e.target.value })}
+      className="col-span-2 rounded-none bg-[#0A0A0A] border-white/10 focus-visible:ring-[#007AFF] focus-visible:ring-offset-0"
+    />
+    <Input
+      placeholder="Reps"
+      value={ex.reps}
+      onChange={(e) => onUpdate({ reps: e.target.value })}
+      className="col-span-3 rounded-none bg-[#0A0A0A] border-white/10 focus-visible:ring-[#007AFF] focus-visible:ring-offset-0"
+    />
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon"
+      onClick={onRemove}
+      className="col-span-1 rounded-none hover:bg-[#FF3B30]/20 hover:text-[#FF3B30]"
+      data-testid={`edit-exercise-delete-${index}`}
+    >
+      <Trash2 className="w-4 h-4" />
+    </Button>
+  </li>
+);
+
+const ExercisesEditor = ({ exercises, setExercises }) => {
+  const updateEx = (i, patch) =>
+    setExercises((prev) => prev.map((e, idx) => (idx === i ? { ...e, ...patch } : e)));
+  const removeEx = (i) => setExercises((prev) => prev.filter((_, idx) => idx !== i));
+  const addEx = () => setExercises((prev) => [...prev, blankExercise()]);
+
+  return (
+    <div>
+      <div className="label-overline mb-2">Exercises</div>
+      <ul className="space-y-2">
+        {exercises.map((ex, i) => (
+          <ExerciseRow
+            key={ex.id}
+            ex={ex}
+            index={i}
+            onUpdate={(patch) => updateEx(i, patch)}
+            onRemove={() => removeEx(i)}
+          />
+        ))}
+      </ul>
+      <Button
+        type="button"
+        variant="ghost"
+        className="mt-3 rounded-none border border-white/20 hover:bg-white/5 uppercase tracking-wider"
+        onClick={addEx}
+        data-testid="add-exercise-btn"
+      >
+        <Plus className="w-4 h-4 mr-2" /> Add Exercise
+      </Button>
+    </div>
+  );
+};
+
+const sanitizeExercises = (list, isRest) => {
+  if (isRest) return [];
+  return list
+    .filter((e) => e.name.trim())
+    .map((e) => ({ ...e, sets: Number(e.sets) || 1 }));
+};
+
 export default function EditPlanDialog({ day, plan, onClose, onSaved }) {
   const open = !!day;
   const [title, setTitle] = useState("");
@@ -36,13 +115,7 @@ export default function EditPlanDialog({ day, plan, onClose, onSaved }) {
       setIsRest(!!plan.is_rest);
       setExercises(plan.exercises || []);
     }
-  }, [plan, day]);
-
-  const updateEx = (i, patch) => {
-    setExercises((prev) => prev.map((e, idx) => (idx === i ? { ...e, ...patch } : e)));
-  };
-  const removeEx = (i) => setExercises((prev) => prev.filter((_, idx) => idx !== i));
-  const addEx = () => setExercises((prev) => [...prev, blankExercise()]);
+  }, [plan, day, setTitle, setIsRest, setExercises]);
 
   const save = async () => {
     setSaving(true);
@@ -50,12 +123,7 @@ export default function EditPlanDialog({ day, plan, onClose, onSaved }) {
       await updatePlanDay(day, {
         title: title || "Untitled",
         is_rest: isRest,
-        exercises: isRest
-          ? []
-          : exercises.filter((e) => e.name.trim()).map((e) => ({
-              ...e,
-              sets: Number(e.sets) || 1,
-            })),
+        exercises: sanitizeExercises(exercises, isRest),
       });
       toast.success("Plan updated");
       onSaved();
@@ -78,7 +146,7 @@ export default function EditPlanDialog({ day, plan, onClose, onSaved }) {
             Edit {day && DAY_LABEL[day]}
           </DialogTitle>
           <DialogDescription className="text-[#A0A0A0]">
-            Customize the day's workout plan.
+            Customize the day&apos;s workout plan.
           </DialogDescription>
         </DialogHeader>
 
@@ -103,59 +171,7 @@ export default function EditPlanDialog({ day, plan, onClose, onSaved }) {
           </div>
 
           {!isRest && (
-            <div>
-              <div className="label-overline mb-2">Exercises</div>
-              <ul className="space-y-2">
-                {exercises.map((ex, i) => (
-                  <li
-                    key={ex.id}
-                    className="grid grid-cols-12 gap-2 items-center border border-white/5 p-2"
-                    data-testid={`edit-exercise-${i}`}
-                  >
-                    <Input
-                      placeholder="Exercise name"
-                      value={ex.name}
-                      onChange={(e) => updateEx(i, { name: e.target.value })}
-                      className="col-span-6 rounded-none bg-[#0A0A0A] border-white/10 focus-visible:ring-[#007AFF] focus-visible:ring-offset-0"
-                      data-testid={`edit-exercise-name-${i}`}
-                    />
-                    <Input
-                      type="number"
-                      min="1"
-                      placeholder="Sets"
-                      value={ex.sets}
-                      onChange={(e) => updateEx(i, { sets: e.target.value })}
-                      className="col-span-2 rounded-none bg-[#0A0A0A] border-white/10 focus-visible:ring-[#007AFF] focus-visible:ring-offset-0"
-                    />
-                    <Input
-                      placeholder="Reps"
-                      value={ex.reps}
-                      onChange={(e) => updateEx(i, { reps: e.target.value })}
-                      className="col-span-3 rounded-none bg-[#0A0A0A] border-white/10 focus-visible:ring-[#007AFF] focus-visible:ring-offset-0"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeEx(i)}
-                      className="col-span-1 rounded-none hover:bg-[#FF3B30]/20 hover:text-[#FF3B30]"
-                      data-testid={`edit-exercise-delete-${i}`}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-              <Button
-                type="button"
-                variant="ghost"
-                className="mt-3 rounded-none border border-white/20 hover:bg-white/5 uppercase tracking-wider"
-                onClick={addEx}
-                data-testid="add-exercise-btn"
-              >
-                <Plus className="w-4 h-4 mr-2" /> Add Exercise
-              </Button>
-            </div>
+            <ExercisesEditor exercises={exercises} setExercises={setExercises} />
           )}
         </div>
 

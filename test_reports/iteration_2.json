@@ -1,0 +1,25 @@
+{
+  "summary": "Refactor regression test passed. All backend endpoints behave identically to iteration_1, settings now returns clean JSON with no _id/ObjectId leak. Frontend Dashboard renders correctly with header, stats cards, today's checklist (progress visible as 4/5 after toggles), weekly schedule sidebar (Mon-Sat shown), edit-day buttons, settings dialog opens, calendar heatmap renders 84 cells (12 weeks x 7 days) with hover info and no React duplicate-key warnings.",
+  "tested_scope": ["backend", "frontend", "integration"],
+  "passed": [
+    "GET /api/plan returns 7 days in order monday->sunday with sunday is_rest=true",
+    "GET /api/today returns date/day/day_label/plan/session fields",
+    "POST /api/sessions/toggle: total_exercises matches plan length (5), completed_at populates only when ALL exercises completed and clears when one is unmarked",
+    "GET /api/sessions works with and without start/end query params (HTTP 200)",
+    "GET /api/stats returns current_streak/best_streak/this_week/this_month/total_workouts (refactored helpers OK)",
+    "PUT /api/plan/monday with valid payload returns 200 and preserves data; PUT /api/plan/notaday returns 400 with detail='Invalid day'",
+    "GET /api/settings returns clean JSON (id,email,reminder_enabled,reminder_time,timezone) — no _id/ObjectId leak; PUT /api/settings updates fields",
+    "POST /api/reminder/send-now returns {sent:false, reason:'disabled_or_missing_config'} (MOCKED: RESEND_API_KEY empty)",
+    "Frontend loads with 'Iron Protocol' header, 4 stats cards, today's checklist, weekly plan sidebar, 12-week heatmap (84 cells)",
+    "Exercise checkbox toggle works and persists across reload (visible as 4/5 progress in screenshot)",
+    "edit-day-{day} buttons (7) open Edit Plan dialog",
+    "open-settings-btn opens Settings dialog",
+    "Heatmap cells render with stable keys (0 console errors, 0 duplicate-key warnings) and heatmap-hover-info appears on hover"
+  ],
+  "failed": [],
+  "action_items": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "retest_needed": false,
+  "full_testing_deferred": true,
+  "mocked_integrations": ["Resend email (RESEND_API_KEY empty) — endpoint correctly returns sent=false reason=disabled_or_missing_config"]
+}
