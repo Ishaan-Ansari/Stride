@@ -1,0 +1,91 @@
+{
+  "project": "Workout Session Log Workflow",
+  "theme": "Dark Mode",
+  "archetype": "Archetype 2: The Performance Pro (Elite Athleticism & Precision)",
+  "philosophy": "Tactical Minimalism. A command-center focus for fitness. No soft shadows, no muddy grays. High-visibility data, sharp edges, and kinetic triggers against a deep obsidian void.",
+  "colors": {
+    "background_base": "#0A0A0A",
+    "surface_primary": "#141414",
+    "surface_secondary": "#1A1A1A",
+    "accent_primary": "#007AFF",
+    "accent_primary_hover": "#3395FF",
+    "accent_danger": "#FF3B30",
+    "accent_success": "#34C759",
+    "text_primary": "#FFFFFF",
+    "text_secondary": "#A0A0A0",
+    "text_muted": "#666666",
+    "border_subtle": "rgba(255, 255, 255, 0.1)",
+    "border_focus": "#007AFF"
+  },
+  "typography": {
+    "font_families": {
+      "heading": "'Barlow Condensed', sans-serif",
+      "body": "'DM Sans', sans-serif",
+      "mono": "'JetBrains Mono', monospace"
+    },
+    "hierarchy": {
+      "h1_hero": "text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter uppercase",
+      "h2_section": "text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight uppercase",
+      "h3_card": "text-xl sm:text-2xl font-bold tracking-tight uppercase",
+      "body_base": "text-base tracking-wide text-gray-300",
+      "body_small": "text-sm text-gray-400",
+      "label_overline": "text-xs font-bold tracking-[0.2em] uppercase text-gray-500"
+    }
+  },
+  "layout_and_spacing": {
+    "strategy": "The Control Room Grid",
+    "spacing_scale": "Generous inside containers, tight between widgets. p-4 to p-12.",
+    "dashboard_grid": "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6",
+    "widget_spans": {
+      "summary_stats": "col-span-1",
+      "todays_checklist": "col-span-2 row-span-2",
+      "calendar_heatmap": "col-span-1 md:col-span-3 lg:col-span-4",
+      "weekly_plan": "col-span-1 row-span-2"
+    }
+  },
+  "visual_enhancers": {
+    "borders": "1px solid rgba(255, 255, 255, 0.1)",
+    "radius": "rounded-none for sharp tactical feel, maximum rounded-sm for micro-elements",
+    "shadows": "Remove soft dropshadows. Use inner glows: shadow-[inset_0_2px_4px_rgba(255,255,255,0.02)]",
+    "glassmorphism": "Avoid in fitness apps (too fragile). Use solid flat dark surfaces.",
+    "textures": "Subtle noise overlay (opacity-5) on the main background."
+  },
+  "components": {
+    "cards": "Flat bg (#141414), 1px subtle border, no shadow. Hover: slight border color lighten to rgba(255,255,255,0.2).",
+    "buttons": "Sharp edges. Primary: bg-[#007AFF] text-white hover:bg-[#3395FF]. Ghost: bg-transparent border border-white/20 hover:bg-white/5.",
+    "checklist_item": "Row with hover state. Checkbox (Shadcn customized to rounded-none). When checked: text-gray-600 line-through transition-all duration-300.",
+    "calendar_heatmap": "Custom grid. Empty/Missed: bg-[#1A1A1A], Completed: bg-[#007AFF]. Rest Day (Sun): bg-[#333333] patterned or striped.",
+    "streak_tracker": "Prominent display. Use large Barlow Condensed numbers (text-5xl to 7xl) in Volt Blue."
+  },
+  "motion_and_interactions": {
+    "hover": "Explicit hover colors required. E.g., hover:text-white hover:border-white/30.",
+    "focus": "High contrast focus rings. focus:outline-none focus:ring-2 focus:ring-[#007AFF] focus:ring-offset-2 focus:ring-offset-[#0A0A0A].",
+    "list_transitions": "Staggered opacity fade-in for list items and grid items."
+  },
+  "media": {
+    "image_urls": [
+      {
+        "url": "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwxfHxneW0lMjB3b3Jrb3V0JTIwZGFya3xlbnwwfHx8fDE3ODI1Nzk5MzV8MA&ixlib=rb-4.1.0&q=85",
+        "category": "hero_background",
+        "description": "Grayscale photo of man doing pull-ups. Use as a low-opacity (5-10%) fixed background graphic or header accent to set a hardcore gym mood without hurting data legibility."
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzJ8MHwxfHNlYXJjaHwzfHxibGFjayUyMGRhcmslMjB0ZXh0dXJlJTIwbm9pc2UlMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc4MjU3OTkyNHww&ixlib=rb-4.1.0&q=85",
+        "category": "surface_texture",
+        "description": "Black textured surface. Use as an overlay mix-blend-screen or opacity-5 over empty state cards to avoid digital flatness."
+      }
+    ]
+  },
+  "accessibility_and_testing": {
+    "contrast": "Strict APCA/WCAG AA compliance. Use Text Shadow over images if text overlaps.",
+    "data_testid_rule": "ALL interactive and key informational elements MUST include a `data-testid` attribute (e.g., `data-testid=\"complete-workout-btn\"`, `data-testid=\"streak-count\"`)."
+  },
+  "instructions_to_main_agent": [
+    "Install Google Fonts in HTML/CSS: Barlow Condensed (weights 400, 700, 900) and DM Sans (weights 400, 500, 700).",
+    "Install Phosphor icons: `yarn add @phosphor-icons/react` for a sharp, tactical look. If failing, use lucide-react.",
+    "Implement the 'Control Room' Bento Grid. Data widgets must have h-full to stretch properly. No jagged bottoms.",
+    "For forms and interactions, strictly use Shadcn UI (Checkbox, Dialog, Select) but customize them heavily to remove 'Vercel' softness. Make radii sharp (rounded-none), borders 1px solid, and dark theme colors.",
+    "Calendar Heatmap: Do not use heavy date libraries if not needed. A simple CSS Grid for the 52-week heatmap (similar to GitHub) is highly preferred, using the defined accent colors.",
+    "Add `data-testid` to everything functional."
+  ]
+}
