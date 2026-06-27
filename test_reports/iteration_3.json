@@ -1,0 +1,26 @@
+{
+  "summary": "Regression test post-refactor (useDashboardData hook, DayCard split, CalendarHeatmap useMemo, use-toast deps). Both backend and frontend smoke + key flows verified end-to-end. All checks pass.",
+  "tested_scope": ["frontend", "backend", "integration"],
+  "passed": [
+    "Backend GET /api/plan 200 (7 days)",
+    "Backend GET /api/today 200 (date + plan + exercises)",
+    "Backend GET /api/stats 200 (current_streak/best_streak/this_week/total_workouts)",
+    "Backend GET /api/settings 200 / PUT /api/settings 200 (persisted)",
+    "Backend GET /api/sessions 200",
+    "Backend POST /api/sessions/toggle 200 with {exercise_id,date,completed} -> persists completion",
+    "Backend POST /api/reminder/send-now 200 -> {sent:false, reason:'disabled_or_missing_config'} (MOCKED: RESEND_API_KEY empty)",
+    "Dashboard renders 'Iron Protocol' header, 4 stats cards (stat-current-streak, stat-best-streak, stat-this-week, stat-total)",
+    "Today's checklist renders 5 exercise checkboxes with today-progress indicator",
+    "Clicking checkbox increments progress (4/5 -> 5/5) and persists across reload (POST /api/sessions/toggle integration OK)",
+    "WeeklyPlan renders all 7 edit-day-{day} buttons (mon-sun); clicking opens EditPlanDialog with prefilled title 'Chest & Triceps'",
+    "Settings: open-settings-btn opens dialog, email + reminder switch saved, toast 'Settings saved' appears",
+    "Calendar heatmap renders 84 cells; hovering shows heatmap-hover-info ('2026-04-16 · No workout logged')",
+    "No React duplicate-key warnings or console errors detected on Dashboard"
+  ],
+  "failed": [],
+  "action_items": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "retest_needed": false,
+  "full_testing_deferred": true,
+  "notes": "Refactor is behavior-preserving. Resend email integration is MOCKED via empty RESEND_API_KEY as intended; /api/reminder/send-now correctly returns disabled_or_missing_config."
+}

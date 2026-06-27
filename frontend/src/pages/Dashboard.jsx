@@ -1,11 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
-import {
-  fetchToday,
-  fetchPlan,
-  fetchStats,
-  fetchSessions,
-  fetchSettings,
-} from "@/lib/api";
+import { useState } from "react";
 import TodaysChecklist from "@/components/workout/TodaysChecklist";
 import WeeklyPlan from "@/components/workout/WeeklyPlan";
 import StatsCards from "@/components/workout/StatsCards";
@@ -13,40 +6,17 @@ import CalendarHeatmap from "@/components/workout/CalendarHeatmap";
 import SettingsDialog from "@/components/workout/SettingsDialog";
 import EditPlanDialog from "@/components/workout/EditPlanDialog";
 import DashboardHeader from "@/components/workout/DashboardHeader";
+import useDashboardData from "@/hooks/useDashboardData";
 
 export default function Dashboard() {
-  const [today, setToday] = useState(null);
-  const [plan, setPlan] = useState([]);
-  const [stats, setStats] = useState(null);
-  const [sessions, setSessions] = useState([]);
-  const [settings, setSettings] = useState(null);
+  const { today, plan, stats, sessions, settings, refresh } = useDashboardData();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [editDay, setEditDay] = useState(null);
-
-  const refresh = useCallback(async () => {
-    const [t, p, s, ss, set] = await Promise.all([
-      fetchToday(),
-      fetchPlan(),
-      fetchStats(),
-      fetchSessions(),
-      fetchSettings(),
-    ]);
-    setToday(t);
-    setPlan(p);
-    setStats(s);
-    setSessions(ss);
-    setSettings(set);
-  }, []);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
 
   return (
     <div className="noise relative min-h-screen">
       <div className="relative z-10 max-w-[1400px] mx-auto px-5 sm:px-8 py-8">
         <DashboardHeader today={today} onOpenSettings={() => setSettingsOpen(true)} />
-
         <StatsCards stats={stats} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-6">

@@ -66,9 +66,9 @@ export default function CalendarHeatmap({ sessions }) {
   const weeks = useMemo(() => buildWeeks(today), [today]);
   const monthLabels = useMemo(() => buildMonthLabels(weeks), [weeks]);
   const sessionMap = useMemo(() => {
-    const m = {};
-    for (const s of sessions || []) m[s.date] = s;
-    return m;
+    const map = {};
+    for (const item of sessions || []) map[item.date] = item;
+    return map;
   }, [sessions]);
 
   return (
