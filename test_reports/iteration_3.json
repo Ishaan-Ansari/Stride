@@ -9,7 +9,7 @@
     "Backend GET /api/sessions 200",
     "Backend POST /api/sessions/toggle 200 with {exercise_id,date,completed} -> persists completion",
     "Backend POST /api/reminder/send-now 200 -> {sent:false, reason:'disabled_or_missing_config'} (MOCKED: RESEND_API_KEY empty)",
-    "Dashboard renders 'Iron Protocol' header, 4 stats cards (stat-current-streak, stat-best-streak, stat-this-week, stat-total)",
+    "Dashboard renders 'Stride' header, 4 stats cards (stat-current-streak, stat-best-streak, stat-this-week, stat-total)",
     "Today's checklist renders 5 exercise checkboxes with today-progress indicator",
     "Clicking checkbox increments progress (4/5 -> 5/5) and persists across reload (POST /api/sessions/toggle integration OK)",
     "WeeklyPlan renders all 7 edit-day-{day} buttons (mon-sun); clicking opens EditPlanDialog with prefilled title 'Chest & Triceps'",

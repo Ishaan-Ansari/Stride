@@ -10,7 +10,7 @@
     "PUT /api/plan/monday with valid payload returns 200 and preserves data; PUT /api/plan/notaday returns 400 with detail='Invalid day'",
     "GET /api/settings returns clean JSON (id,email,reminder_enabled,reminder_time,timezone) — no _id/ObjectId leak; PUT /api/settings updates fields",
     "POST /api/reminder/send-now returns {sent:false, reason:'disabled_or_missing_config'} (MOCKED: RESEND_API_KEY empty)",
-    "Frontend loads with 'Iron Protocol' header, 4 stats cards, today's checklist, weekly plan sidebar, 12-week heatmap (84 cells)",
+    "Frontend loads with 'Stride' header, 4 stats cards, today's checklist, weekly plan sidebar, 12-week heatmap (84 cells)",
     "Exercise checkbox toggle works and persists across reload (visible as 4/5 progress in screenshot)",
     "edit-day-{day} buttons (7) open Edit Plan dialog",
     "open-settings-btn opens Settings dialog",

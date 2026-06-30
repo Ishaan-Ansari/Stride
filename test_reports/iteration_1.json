@@ -1,5 +1,5 @@
 {
-  "summary": "First-finish smoke test of Iron Protocol workout log. Backend API endpoints (plan, today, sessions/toggle, sessions, stats, settings, reminder/send-now, PUT plan/{day}) all functional. Frontend Dashboard renders with header, 4 stats cards, today's checklist with checkboxes, weekly plan sidebar (MON-SUN), calendar, Edit Plan dialog, and Settings dialog. Checkbox toggle updates 0/5 -> 1/5 and persists across reload. Settings save works and Resend gracefully returns sent=false with reason='disabled_or_missing_config' when key is empty.",
+  "summary": "First-finish smoke test of Stride workout log. Backend API endpoints (plan, today, sessions/toggle, sessions, stats, settings, reminder/send-now, PUT plan/{day}) all functional. Frontend Dashboard renders with header, 4 stats cards, today's checklist with checkboxes, weekly plan sidebar (MON-SUN), calendar, Edit Plan dialog, and Settings dialog. Checkbox toggle updates 0/5 -> 1/5 and persists across reload. Settings save works and Resend gracefully returns sent=false with reason='disabled_or_missing_config' when key is empty.",
   "tested_scope": ["backend", "frontend", "integration"],
   "passed": [
     "GET /api/plan -> 200, 7 days monday..sunday in order, sunday is_rest=true with 0 exercises, monday has 5 exercises (Chest & Triceps)",
@@ -11,7 +11,7 @@
     "PUT /api/plan/foo -> 400 'Invalid day'",
     "GET /api/settings -> 200 default; PUT /api/settings updates email/reminder_enabled/reminder_time",
     "POST /api/reminder/send-now -> {sent:false, reason:'disabled_or_missing_config'} when RESEND_API_KEY empty",
-    "Frontend loads with 'Iron Protocol' header and all 4 stats cards (Current Streak, Best Streak, This Week, Total Workouts)",
+    "Frontend loads with 'Stride' header and all 4 stats cards (Current Streak, Best Streak, This Week, Total Workouts)",
     "Exercise checkbox click updates progress 0/5 -> 1/5 and persists after reload",
     "Weekly Protocol sidebar shows MON,TUE,WED,THU,FRI,SAT,SUN",
     "Calendar heatmap element present",

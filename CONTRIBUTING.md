@@ -1,4 +1,4 @@
-# Contributing to Iron Protocol
+# Contributing to Stride
 
 This is a solo-friendly project with a clean, deliberate structure. Contributions are welcome — but keep the tactical aesthetic intact. No bloat. No noise. Ship tight, tested code that fits the mission.
 

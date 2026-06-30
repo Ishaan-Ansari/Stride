@@ -14,7 +14,7 @@ export default function DashboardHeader({ today, onOpenSettings }) {
             className="font-display font-black text-2xl sm:text-3xl uppercase tracking-tight leading-none"
             data-testid="app-title"
           >
-            Iron Protocol
+            Stride
           </h1>
         </div>
       </div>

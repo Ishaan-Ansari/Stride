@@ -1,4 +1,4 @@
-# Iron Protocol — Workout Session Log
+# Stride — Workout Session Log
 
 ## Original Problem Statement
 "I want to create a workout session log workflow which has my day-wise workout schedule from Monday to Saturday and everyday at 6:30 AM, I should get a checklist of all the exercises to be performed at that particular day. And should also have a streak and a calendar, which keeps track of all my workouts. It should automatically share the day-wise plan of what exercise to do on that particular day."

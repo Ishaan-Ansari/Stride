@@ -1,4 +1,4 @@
-# Iron Protocol — Workout Session Log
+# Stride — Workout Session Log
 
 A tactical, dark-themed workout tracker that delivers your day's exercises like a daily mission briefing. Mon–Sat workouts, Sunday rest, streak tracking that respects rest days, and a 12-week activity heatmap.
 
