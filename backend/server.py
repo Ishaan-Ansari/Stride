@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -21,7 +22,21 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # --- startup ---
+    await ensure_seed()
+    reschedule_reminder()
+    if not scheduler.running:
+        scheduler.start()
+    logger.info("Scheduler started. Daily reminder armed for 06:30.")
+    yield
+    # --- shutdown ---
+    if scheduler.running:
+        scheduler.shutdown()
+    client.close()
+
+app = FastAPI(lifespan=lifespan)
 api_router = APIRouter(prefix="/api")
 
 # ------------------------- Models -------------------------
@@ -427,14 +442,6 @@ def reschedule_reminder():
         replace_existing=True,
     )
 
-@app.on_event("startup")
-async def on_startup():
-    await ensure_seed()
-    reschedule_reminder()
-    if not scheduler.running:
-        scheduler.start()
-    logger.info("Scheduler started. Daily reminder armed for 06:30.")
-
 app.include_router(api_router)
 
 app.add_middleware(
@@ -447,9 +454,3 @@ app.add_middleware(
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    if scheduler.running:
-        scheduler.shutdown()
-    client.close()
